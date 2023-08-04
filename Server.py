@@ -11,6 +11,10 @@ def get_local_ip():
         print(f"Error getting local IP address: {e}")
         return None
 
+def ask_save_option(file_name):
+    option = input(f"A file with the name '{file_name}' already exists. Do you want to:\n1. Add the data to the existing file (A), or\n2. Replace the existing file (R)?\nYour choice (A/R): ").lower()
+    return option
+
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -25,10 +29,19 @@ def start_server():
     server_socket.listen(5)
     print(f"Server is listening on {server_ip}:{server_port}")
 
+    data_received = []	
+
     try:
         while True:
-            client_address = server_socket.accept()
+            client_socket, client_address = server_socket.accept()
             print(f"Accepted connection from {client_address}")
+
+            data = client_socket.recv(1024).decode('utf-8')	
+            print(f"Received data from client: {data}")
+
+            data_received.append(data)
+
+            client_socket.close()
 
     except KeyboardInterrupt:
         print(f"KeyboardInterrupt detected. Closing the server.")
