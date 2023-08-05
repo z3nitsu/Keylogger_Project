@@ -1,5 +1,6 @@
 import socket
 import os
+import threading
 def get_local_ip():
     try:
         temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -66,6 +67,7 @@ def handle_client(client_socket):
         client_socket.close()
 
 def start_server():
+    global server_socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     server_ip = get_local_ip()
@@ -78,25 +80,23 @@ def start_server():
 
     server_socket.listen(5)
     print(f"Server is listening on {server_ip}:{server_port}")
-
-    data_received = []	
-
+    
+def main():
+    start_server()
     try:
         while True:
+            # Accept a connection from a client
             client_socket, client_address = server_socket.accept()
             print(f"Accepted connection from {client_address}")
 
-            data = client_socket.recv(1024).decode('utf-8')	
-            print(f"Received data from client: {data}")
-
-            data_received.append(data)
-
-            client_socket.close()
+            # Create a separate thread to handle the client
+            client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+            client_thread.start()
 
     except KeyboardInterrupt:
-        print(f"KeyboardInterrupt detected. Closing the server.")
+        print("\nKeyboardInterrupt detected. Closing the server.")
     finally:
         server_socket.close()
 
 if __name__ == "__main__":
-    start_server()
+    main()
