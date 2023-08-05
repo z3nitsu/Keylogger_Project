@@ -27,6 +27,44 @@ def ask_save_option(file_name):
         save_option = option
     return save_option
 
+def handle_client(client_socket):
+    data_received = []
+    file_name = 'received_data.txt'
+
+    try:
+        file_created = False
+
+        while True:
+            data = client_socket.recv(1024).decode('utf-8')
+            if not data:
+                break
+
+            print(f"Received data from client: {data}")
+
+            if data.strip().lower() == 'exit':
+                print("Exit command received.")
+                break
+
+            data_received.append(data)
+
+            if not file_created:
+                option = ask_save_option(file_name)
+                if option == 'a':
+                    with open(file_name, 'a') as file:
+                        file.write(data + '\n')
+                elif option == 'r':
+                    with open(file_name, 'w') as file:
+                        file.write(data + '\n')
+                file_created = True
+            else:
+                with open(file_name, 'a') as file:
+                    file.write(data + '\n')
+
+    except Exception as e:
+        print(f"Error handling client data: {e}")
+    finally:
+        client_socket.close()
+
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
