@@ -11,9 +11,21 @@ def get_local_ip():
         print(f"Error getting local IP address: {e}")
         return None
 
+save_option = None
+
 def ask_save_option(file_name):
-    option = input(f"A file with the name '{file_name}' already exists. Do you want to:\n1. Add the data to the existing file (A), or\n2. Replace the existing file (R)?\nYour choice (A/R): ").lower()
-    return option
+    global save_option
+    if save_option is None:
+        if os.path.isfile(file_name):
+            option = input(f"A file with the name '{file_name}' already exists. Do you want to:\n1. Add the data to the existing file (A), or\n2. Replace the existing file (R)?\nYour choice (A/R): ").lower()
+            if option not in ('a', 'r'):
+                print("Invalid choice. Defaulting to 'A' (Add).")
+                option = 'a'
+        else:
+            print(f"File '{file_name}' does not exist. Creating a new file.")
+            option = 'a'
+        save_option = option
+    return save_option
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
